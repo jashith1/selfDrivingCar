@@ -5,8 +5,6 @@ class Car {
 		this.width = width;
 		this.height = height;
 
-		this.controls = new Controls();
-
 		this.speed = 0;
 		this.acceleration = 0.2;
 		this.reverseAcceleration = this.acceleration / 2;
@@ -15,20 +13,31 @@ class Car {
 		this.friction = 0.03;
 		this.angle = 0;
 		this.angularSpeed = 0.03;
+
+		this.sensor = new Sensor(this, 10, 150, Math.PI / 2);
+		this.controls = new Controls();
 	}
+
+	update(roadBorders) {
+		this.#move();
+		this.sensor.update(roadBorders);
+	}
+
 	draw(ctx) {
 		ctx.save();
 		ctx.translate(this.x, this.y);
-		ctx.rotate(this.angle);
+		ctx.rotate(-this.angle);
 
 		ctx.beginPath();
 		ctx.rect(-this.width / 2, -this.height / 2, this.width, this.height);
 		ctx.fill();
 
 		ctx.restore();
+
+		this.sensor.draw(ctx);
 	}
 
-	update() {
+	#move() {
 		if (this.controls.forward) {
 			this.speed += this.acceleration;
 		}
@@ -48,13 +57,13 @@ class Car {
 			this.speed -= this.friction * Math.sign(this.speed);
 			const flip = this.speed > 0 ? 1 : -1;
 			if (this.controls.left) {
-				this.angle -= this.angularSpeed * flip;
-			}
-			if (this.controls.right) {
 				this.angle += this.angularSpeed * flip;
 			}
+			if (this.controls.right) {
+				this.angle -= this.angularSpeed * flip;
+			}
 		}
-		this.x += this.speed * Math.sin(this.angle);
+		this.x -= this.speed * Math.sin(this.angle);
 		this.y -= this.speed * Math.cos(this.angle);
 	}
 }
