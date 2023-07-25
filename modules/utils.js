@@ -27,3 +27,12 @@ function getIntersection(A, B, C, D) {
 
 	return null;
 }
+
+function polyIntersect(p1, p2) {
+	for (var i = 0; i < p1.length; i++) {
+		for (var j = 0; j < p2.length; j++) {
+			const touch = getIntersection(p1[i], p1[(i + 1) % p1.length], p2[j], p2[(j + 1) % p2.length]);
+			if (touch) return true;
+		}
+	}
+}
