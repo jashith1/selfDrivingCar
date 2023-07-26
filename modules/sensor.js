@@ -8,20 +8,28 @@ class Sensor {
 		this.raySpread = raySpread;
 	}
 
-	update(roadBorders) {
+	update(roadBorders, traffic) {
 		this.#castRays();
 		this.readings = [];
 		for (let i = 0; i < this.rayCount; i++) {
-			this.readings.push(this.#getReading(this.rays[i], roadBorders));
+			this.readings.push(this.#getReading(this.rays[i], roadBorders, traffic));
 		}
 	}
 
-	#getReading(rays, roadBorders) {
+	#getReading(rays, roadBorders, traffic) {
 		let touches = [];
 
 		for (let i = 0; i < roadBorders.length; i++) {
 			const touch = getIntersection(rays[0], rays[1], roadBorders[i][0], roadBorders[i][1]);
 			if (touch) touches.push(touch);
+		}
+
+		for (let i = 0; i < traffic.length; i++) {
+			const poly = traffic[i].polygon;
+			for (let j = 0; j < poly.length; j++) {
+				const touch = getIntersection(rays[0], rays[1], poly[j], poly[(j + 1) % poly.length]);
+				if (touch) touches.push(touch);
+			}
 		}
 
 		if (touches.length === 0) return null;
